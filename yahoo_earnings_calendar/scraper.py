@@ -75,9 +75,22 @@ class YahooEarningsCalendar(object):
                 'Date should be a datetime.date object')
         date_str = date.strftime('%Y-%m-%d')
         logger.debug('Fetching earnings data for %s', date_str)
-        dated_url = '{0}?day={1}'.format(BASE_URL, date_str)
-        page_data_dict = self._get_data_dict(dated_url)
-        return page_data_dict['context']['dispatcher']['stores']['ScreenerResultsStore']['results']['rows']
+
+        offset = 0
+        pagesize = 100
+        results = []
+
+        while True:
+            dated_url = '{0}?day={1}&offset={2}&size={3}'.format(BASE_URL, date_str, offset, pagesize)
+            page_data_dict = self._get_data_dict(dated_url)
+            page = page_data_dict['context']['dispatcher']['stores']['ScreenerResultsStore']['results']['rows']
+            if len(page) == 0:
+                break
+
+            results = results + page
+            offset = offset + pagesize
+
+        return results
 
     def earnings_between(self, from_date, to_date):
         """Gets earnings calendar data from Yahoo! in a date range.
@@ -121,11 +134,11 @@ class YahooEarningsCalendar(object):
 
 if __name__ == '__main__':
     date_from = datetime.datetime.strptime(
-        'May 5 2017  10:00AM', '%b %d %Y %I:%M%p')
+        'May 1 2018  1:00AM', '%b %d %Y %I:%M%p')
     date_to = datetime.datetime.strptime(
         'May 8 2017  1:00PM', '%b %d %Y %I:%M%p')
     yec = YahooEarningsCalendar()
-    print yec.earnings_on(date_from)
-    print yec.earnings_between(date_from, date_to)
+    print len(yec.earnings_on(date_from))
+    # print yec.earnings_between(date_from, date_to)
     # Returns the next earnings date of BOX in Unix timestamp
-    print yec.get_next_earnings_date('box')
+    # print yec.get_next_earnings_date('box')
