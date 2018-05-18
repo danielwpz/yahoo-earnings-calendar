@@ -9,7 +9,7 @@ setup(
     install_requires=[
         'requests'
     ],
-    version='0.0.1',
+    version='0.0.2',
     description='Scrapes data from Yahoo! Finance earnings calendar',
     author='Daniel Wang',
     author_email='danielwpz@gmail.com',
